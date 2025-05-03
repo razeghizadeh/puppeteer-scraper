@@ -10,7 +10,7 @@ app.get('/scrape', async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      executablePath: '/usr/bin/chromium-browser',  // مسیر کرومیوم یا کروم
+      executablePath: '/usr/bin/chromium-browser',  // مسیر نصب کرومیوم
       headless: true,
     });
     const page = await browser.newPage();
