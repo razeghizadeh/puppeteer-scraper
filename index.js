@@ -1,19 +1,27 @@
+const express = require('express');
 const puppeteer = require('puppeteer');
+const app = express();
 
-async function scrapePrice() {
-  const browser = await puppeteer.launch({
-    headless: true,
-    executablePath: '/usr/bin/chromium',  // مسیر نصب Chromium در Render
-  });
-  const page = await browser.newPage();
-  await page.goto('https://www.javanelec.com/shops/productdetail/7470', { waitUntil: 'domcontentloaded' });
+app.get('/scrape', async (req, res) => {
+    const targetUrl = req.query.url;
+    if (!targetUrl) return res.status(400).send('Missing url parameter');
 
-  // فرض بر این است که قیمت در یک عنصر خاص موجود است. شما باید این بخش را با انتخاب درست مطابق سایت خود اصلاح کنید
-  const price = await page.$eval('.price-class', element => element.textContent); // کلاس مناسب برای قیمت را قرار دهید
+    try {
+        const browser = await puppeteer.launch({
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        const page = await browser.newPage();
+        await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 30000 });
 
-  console.log('Price:', price);
+        const html = await page.content();
+        await browser.close();
+        res.send(html);
+    } catch (err) {
+        res.status(500).send('Error: ' + err.toString());
+    }
+});
 
-  await browser.close();
-}
-
-scrapePrice().catch(console.error);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
