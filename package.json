@@ -1,13 +1,13 @@
 {
-  "name": "puppeteer-scraper",
+  "name": "scraper-service",
   "version": "1.0.0",
-  "description": "Scraper for javanelec.com using Puppeteer on Render",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "puppeteer": "^21.3.8"
+    "playwright": "^1.43.0"
   }
 }
