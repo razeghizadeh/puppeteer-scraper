@@ -1,26 +1,39 @@
 const express = require('express');
+const puppeteer = require('puppeteer');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-const chromium = require('chrome-aws-lambda');
-const puppeteer = require('puppeteer-core');
+app.get('/scrape', async (req, res) => {
+  const id = req.query.id;
+  if (!id) return res.status(400).json({ error: 'Missing ?id= parameter' });
 
-app.get('/', async (req, res) => {
+  const url = `https://javanelec.com/product/${id}/`;
+
   try {
     const browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath: await chromium.executablePath,
-      headless: chromium.headless
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     const page = await browser.newPage();
-    await page.goto('https://example.com');
-    const title = await page.title();
+    await page.goto(url, { waitUntil: 'domcontentloaded' });
+
+    const data = await page.evaluate(() => {
+      const title = document.querySelector('h1')?.innerText?.trim() || null;
+      const price = document.querySelector('.price')?.innerText?.trim() || null;
+
+      return { title, price };
+    });
 
     await browser.close();
-    res.send(`Title is: ${title}`);
+    res.json({
+      id,
+      url,
+      ...data
+    });
   } catch (err) {
-    res.status(500).send(`Error: ${err}`);
+    res.status(500).json({ error: err.toString() });
   }
 });
 
