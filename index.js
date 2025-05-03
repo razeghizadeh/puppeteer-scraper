@@ -1,5 +1,5 @@
 import express from 'express';
-import { chromium } from 'playwright';
+import puppeteer from 'puppeteer-core';  // تغییر از puppeteer به puppeteer-core
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,8 +9,9 @@ app.get('/scrape', async (req, res) => {
   if (!url) return res.status(400).send('Missing ?url= parameter');
 
   try {
-    const browser = await chromium.launch({
-      headless: true,
+    const browser = await puppeteer.launch({
+      executablePath: '/usr/bin/google-chrome-stable',  // مسیر مرورگر کروم (در صورت نصب کروم در سرور)
+      headless: true,  // برای اجرای بدون واسط گرافیکی
     });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'domcontentloaded' });
