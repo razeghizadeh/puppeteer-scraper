@@ -4,6 +4,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "postinstall": "apt-get update && apt-get install -y chromium-browser && npx playwright install --with-deps",
     "start": "node index.js"
   },
   "dependencies": {
