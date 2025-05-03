@@ -1,42 +1,34 @@
-const express = require('express');
-const puppeteer = require('puppeteer');
+import express from 'express';
+import { chromium } from 'playwright';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.get('/scrape', async (req, res) => {
-  const id = req.query.id;
-  if (!id) return res.status(400).json({ error: 'Missing ?id= parameter' });
-
-  const url = `https://javanelec.com/product/${id}/`;
+  const url = req.query.url;
+  if (!url) return res.status(400).send('Missing ?url= parameter');
 
   try {
-    const browser = await puppeteer.launch({
+    const browser = await chromium.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-    const data = await page.evaluate(() => {
-      const title = document.querySelector('h1')?.innerText?.trim() || null;
-      const price = document.querySelector('.price')?.innerText?.trim() || null;
-
-      return { title, price };
-    });
+    const title = await page.title();
+    const content = await page.content();
 
     await browser.close();
-    res.json({
-      id,
-      url,
-      ...data
-    });
+    res.json({ title, html: content });
   } catch (err) {
-    res.status(500).json({ error: err.toString() });
+    res.status(500).send('Error: ' + err.message);
   }
 });
 
+app.get('/', (req, res) => {
+  res.send('Scraper service is running. Use /scrape?url=https://example.com');
+});
+
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
