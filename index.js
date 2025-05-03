@@ -1,5 +1,5 @@
 import express from 'express';
-import { chromium } from 'playwright';  // از Playwright به جای Puppeteer استفاده می‌کنیم
+import { chromium } from 'playwright';  // استفاده از Playwright به جای Puppeteer
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,7 +10,7 @@ app.get('/scrape', async (req, res) => {
 
   try {
     const browser = await chromium.launch({
-      headless: true,  // در حالت headless اجرا می‌کنیم
+      headless: true,  // در حالت headless اجرا می‌شود (بدون نمایش UI)
     });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'domcontentloaded' });
