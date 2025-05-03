@@ -1,9 +1,10 @@
 {
   "name": "puppeteer-scraper",
   "version": "1.0.0",
-  "description": "Simple Puppeteer scraper for Render",
+  "description": "Simple Puppeteer scraper API",
   "main": "index.js",
   "scripts": {
+    "postinstall": "puppeteer install --ignore-scripts",
     "start": "node index.js"
   },
   "dependencies": {
