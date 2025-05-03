@@ -1,5 +1,5 @@
 import express from 'express';
-import puppeteer from 'puppeteer-core';  // تغییر از puppeteer به puppeteer-core
+import puppeteer from 'puppeteer-core';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,8 +10,8 @@ app.get('/scrape', async (req, res) => {
 
   try {
     const browser = await puppeteer.launch({
-      executablePath: '/usr/bin/google-chrome-stable',  // مسیر مرورگر کروم (در صورت نصب کروم در سرور)
-      headless: true,  // برای اجرای بدون واسط گرافیکی
+      executablePath: '/usr/bin/chromium-browser',  // مسیر کرومیوم یا کروم
+      headless: true,
     });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: 'domcontentloaded' });
