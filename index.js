@@ -1,12 +1,29 @@
-const puppeteer = require("puppeteer");
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
 
-(async () => {
-  const browser = await puppeteer.launch({ headless: "new" });
-  const page = await browser.newPage();
-  await page.goto("https://www.javanelec.com/shops/productdetail/7470", {
-    waitUntil: "networkidle2",
-  });
-  const content = await page.content();
-  console.log(content);
-  await browser.close();
-})();
+const chromium = require('chrome-aws-lambda');
+const puppeteer = require('puppeteer-core');
+
+app.get('/', async (req, res) => {
+  try {
+    const browser = await puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath,
+      headless: chromium.headless
+    });
+
+    const page = await browser.newPage();
+    await page.goto('https://example.com');
+    const title = await page.title();
+
+    await browser.close();
+    res.send(`Title is: ${title}`);
+  } catch (err) {
+    res.status(500).send(`Error: ${err}`);
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
