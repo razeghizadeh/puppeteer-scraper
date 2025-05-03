@@ -1,19 +1,19 @@
 const puppeteer = require('puppeteer');
 
 async function scrapePrice() {
-    const browser = await puppeteer.launch();
-    const page = await browser.newPage();
-    
-    // URL صفحه‌ای که می‌خواهید از آن اطلاعات بگیرید
-    const url = 'https://www.javanelec.com/shops/productdetail/7470';
-    await page.goto(url, { waitUntil: 'domcontentloaded' });
+  const browser = await puppeteer.launch({
+    headless: true,
+    executablePath: '/usr/bin/chromium',  // مسیر نصب Chromium در Render
+  });
+  const page = await browser.newPage();
+  await page.goto('https://www.javanelec.com/shops/productdetail/7470', { waitUntil: 'domcontentloaded' });
 
-    // استفاده از selector برای استخراج قیمت
-    const price = await page.$eval('.product-price', el => el.textContent);
-    
-    console.log('Price:', price);
-    
-    await browser.close();
+  // فرض بر این است که قیمت در یک عنصر خاص موجود است. شما باید این بخش را با انتخاب درست مطابق سایت خود اصلاح کنید
+  const price = await page.$eval('.price-class', element => element.textContent); // کلاس مناسب برای قیمت را قرار دهید
+
+  console.log('Price:', price);
+
+  await browser.close();
 }
 
-scrapePrice();
+scrapePrice().catch(console.error);
